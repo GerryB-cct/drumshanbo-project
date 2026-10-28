@@ -15,8 +15,11 @@ Newest first.
 - Checked phone layout at 360px with headless Edge screenshots.
 - Known gaps: see README §9 ("Known gaps and decisions"). Push hasn't been tried on a real phone yet.
 
-- Committed as `749ae72` on `feature/drumshanbo-project` (not pushed; no remote yet).
 - Report: [reports/2026-10-28-session-report.md](reports/2026-10-28-session-report.md)
+- Git: own GitHub repo https://github.com/GerryB-cct/drumshanbo-project (HTTPS). `main` holds only an
+  empty starting commit; all work is on `feature/drumshanbo-project`. Merge into `main` by pull request once
+  the owner has checked it. Kept separate from `lowcode-project` (needed for course marking); the branch
+  briefly pushed there was deleted, so that repo's `main` is unchanged.
 
-**Next:** decide where to push the branch; owner to test on a phone (Chrome DevTools mobile view, then Cloudflare Tunnel), enable push
+**Next:** owner to review the branch and merge it into `main`; test on a phone (Chrome DevTools mobile view, then Cloudflare Tunnel), enable push
 on a device, and register the Task Scheduler job.

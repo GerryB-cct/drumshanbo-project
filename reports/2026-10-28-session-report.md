@@ -12,7 +12,7 @@ The whole web application in the spec was built in one session: all four milesto
 tests and documentation. It runs on this PC at http://localhost:5000, with Mailpit catching every
 email at http://localhost:8025. 57 automated tests pass, and acceptance tests 1–8 behaved as the spec
 says when run against the live app. The work is committed to git on the `feature/drumshanbo-project`
-branch as commit `749ae72`. It has not been pushed to GitHub yet.
+branch and pushed to https://github.com/GerryB-cct/drumshanbo-project.
 
 ## Decisions made at the start
 
@@ -72,7 +72,7 @@ branch as commit `749ae72`. It has not been pushed to GitHub yet.
 - Try push notifications on a real device. iPhones need the app added to the Home Screen first.
 - Register the daily 08:00 job in Windows Task Scheduler (the PowerShell is in README §5).
 - Test on a real phone via Cloudflare Tunnel (README §6), and have someone non-technical borrow and return a book (acceptance test 9).
-- Decide where to push the git branch: the `lowcode-project` GitHub repo, or a new repo of its own.
+- Review `feature/drumshanbo-project` on GitHub and merge it into `main` by pull request.
 - Replace the placeholders: the Irish welcome line (needs checking by an Irish speaker), the privacy notice and the logo.
 
 ## Decisions taken where the spec was silent
