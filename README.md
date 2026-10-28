@@ -10,6 +10,7 @@ and is ready to move to a Linux VPS later (see [Moving to production](#moving-to
 
 - Spec: `SPEC.md` (copy of the original specification)
 - Session diary: [LOG.md](LOG.md)
+- Reports: [28 Oct 2026: PoC built](reports/2026-10-28-session-report.md)
 
 ---
 

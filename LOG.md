@@ -15,5 +15,8 @@ Newest first.
 - Checked phone layout at 360px with headless Edge screenshots.
 - Known gaps: see README §9 ("Known gaps and decisions"). Push hasn't been tried on a real phone yet.
 
-**Next:** owner to test on a phone (Chrome DevTools mobile view, then Cloudflare Tunnel), enable push
+- Committed as `749ae72` on `feature/drumshanbo-project` (not pushed; no remote yet).
+- Report: [reports/2026-10-28-session-report.md](reports/2026-10-28-session-report.md)
+
+**Next:** decide where to push the branch; owner to test on a phone (Chrome DevTools mobile view, then Cloudflare Tunnel), enable push
 on a device, and register the Task Scheduler job.
