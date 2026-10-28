@@ -1,0 +1,52 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import field, post_button %}
+{% block title %}{{ 'Edit book' if book else 'Add a book' }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.books') }}">‹ Books</a></p>
+<h1>{{ 'Edit book' if book else 'Add a book' }}</h1>
+{% if book %}<p>Status: <span class="pill {{ book.status }}">{{ book.status.replace('_', ' ') }}</span>
+  · <a href="{{ url_for('admin.book_status', book_id=book.id) }}">Change status</a></p>{% endif %}
+
+<form method="post" class="form-card" novalidate style="max-width:44rem" id="book-form">
+  {{ form.hidden_tag() }}
+  <label for="{{ form.isbn.id }}">{{ form.isbn.label.text }}</label>
+  <div class="search-row">
+    {{ form.isbn(inputmode="numeric", autocomplete="off") }}
+    <button class="btn secondary" type="button" id="isbn-lookup" data-url="{{ url_for('admin.isbn_lookup') }}">Look up</button>
+  </div>
+  <p class="hint">Type an ISBN and tap "Look up" to fill in the details from Open Library. Many trad books have no ISBN, so just fill in the details below.</p>
+  <div class="btn-row" style="margin:.5rem 0 0"><button class="btn secondary small" type="button" id="scan-btn">Scan barcode with camera</button></div>
+  <div id="scanner" hidden></div>
+  {% for e in form.isbn.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+  <div id="isbn-result" role="status" aria-live="polite"></div>
+  <img id="cover-preview" class="cover" alt="Cover preview" src="{{ form.cover_url.data or '' }}" {{ '' if form.cover_url.data else 'hidden' }} style="margin-top:.75rem">
+
+  {{ field(form.title) }}
+  {{ field(form.author) }}
+  {{ field(form.book_type) }}
+  {{ field(form.notes) }}
+  {{ field(form.cover_url) }}
+  <div class="btn-row">
+    <button class="btn" type="submit">Save</button>
+    {% if not book %}<button class="btn secondary" type="submit" name="another" value="1">Save and add another</button>{% endif %}
+  </div>
+</form>
+
+{% if book %}
+  <h2>Recent loans</h2>
+  {% if loans %}
+  <div class="table-wrap"><table>
+    <tr><th>Member</th><th>Borrowed</th><th>Due</th><th>Status</th></tr>
+    {% for l in loans %}<tr><td>{{ l.user.name }}</td><td>{{ l.borrowed_on | short_date }}</td><td>{{ l.due_on | short_date }}</td><td><span class="pill {{ l.status }}">{{ l.status.replace('_', ' ') }}</span></td></tr>{% endfor %}
+  </table></div>
+  {% else %}<p class="muted">Never borrowed.</p>{% endif %}
+
+  <h2>Delete</h2>
+  {% if has_history %}
+    <p class="muted">This book has loan history, so it can't be deleted. Use <a href="{{ url_for('admin.book_status', book_id=book.id) }}">Change status → Withdrawn</a> instead.</p>
+  {% else %}
+    {{ post_button(url_for('admin.book_delete', book_id=book.id), 'Delete this book', 'btn danger', confirm='Delete this book for good?') }}
+  {% endif %}
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/book_form.js') }}"></script>{% endblock %}

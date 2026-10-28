@@ -1,0 +1,46 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Change status{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.book_edit', book_id=book.id) }}">‹ {{ book.title }}</a></p>
+<h1>Change status</h1>
+<p class="confirm-title" style="font-size:1.4rem">{{ book.title }}</p>
+<p>Now: <span class="pill {{ book.status }}">{{ book.status.replace('_', ' ') }}</span>
+  {% if loan %}· {{ loan.status.replace('_', ' ') }} by <a href="{{ url_for('admin.member_detail', user_id=loan.user_id) }}">{{ loan.user.name }}</a>, due {{ loan.due_on | short_date }}{% endif %}
+  {% if req %}· requested by {{ req.user.name }} ({{ req.status.replace('_', ' ') }}{% if req.hold_until %} until {{ req.hold_until | short_date }}{% endif %}){% endif %}
+</p>
+{% if loan and loan.status == 'returned_pending' %}
+<div class="notice">This book is waiting to be checked in. <a href="{{ url_for('admin.loan_check', loan_id=loan.id) }}">Confirm on shelf or Not received</a> is usually the better choice.</div>
+{% endif %}
+
+<div class="grid-2">
+  <form method="post" class="form-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 style="margin-top:0">On the shelf</h2>
+    <p class="small">Closes any open loan. If someone has asked for it, it's held for them and they're emailed.</p>
+    <button class="btn block" name="action" value="shelf" type="submit">Mark on shelf</button>
+  </form>
+  <form method="post" class="form-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 style="margin-top:0">Borrowed by…</h2>
+    <label for="member_id" style="margin-top:0">Member</label>
+    <select id="member_id" name="member_id" required>
+      <option value="">Choose a member</option>
+      {% for p in people %}<option value="{{ p.id }}">{{ p.name }} ({{ p.email }})</option>{% endfor %}
+    </select>
+    <p class="small">Records a new loan from today, skipping the usual borrowing rules.</p>
+    <button class="btn block" name="action" value="borrowed" type="submit">Record as borrowed</button>
+  </form>
+  <form method="post" class="form-card" data-confirm="Mark this book as lost? It will be hidden from the catalogue.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 style="margin-top:0">Lost</h2>
+    <p class="small">Hidden from the catalogue but kept in the records.</p>
+    <button class="btn danger block" name="action" value="lost" type="submit">Mark as lost</button>
+  </form>
+  <form method="post" class="form-card" data-confirm="Withdraw this book? It will be hidden from the catalogue.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 style="margin-top:0">Withdrawn</h2>
+    <p class="small">Taken out of the collection. Hidden from the catalogue but kept in the records.</p>
+    <button class="btn danger block" name="action" value="withdrawn" type="submit">Withdraw</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Members{% endblock %}
+{% block content %}
+<h1>Members</h1>
+<form method="post" action="{{ url_for('admin.members', status=status) }}" class="form-card" role="search">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="q" style="margin-top:0">Search by name, email or phone</label>
+  <div class="search-row">
+    <input type="search" id="q" name="q" value="{{ q }}">
+    <button class="btn" type="submit">Search</button>
+  </div>
+</form>
+<div class="tabs">
+  <a href="{{ url_for('admin.members') }}" class="{{ 'active' if not status }}">All</a>
+  <a href="{{ url_for('admin.members', status='active') }}" class="{{ 'active' if status == 'active' }}">Active</a>
+  <a href="{{ url_for('admin.members', status='suspended') }}" class="{{ 'active' if status == 'suspended' }}">Suspended</a>
+  <a href="{{ url_for('admin.admin_create') }}">+ New librarian (admin)</a>
+</div>
+<div class="table-wrap"><table>
+  <tr><th>Name</th><th>Email</th><th>Phone</th><th>Books out</th><th>Status</th></tr>
+  {% for u in people %}
+  {% set out = u.current_loans() %}
+  <tr>
+    <td><a href="{{ url_for('admin.member_detail', user_id=u.id) }}">{{ u.name }}</a>{% if u.is_admin %} <span class="pill">admin</span>{% endif %}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.phone }}</td>
+    <td>{{ out | length }}{% if out | selectattr('due_on', 'lt', today) | list %} <span class="pill lost">overdue</span>{% endif %}</td>
+    <td><span class="pill {{ u.status }}">{{ u.status }}</span></td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="muted">No members found.</td></tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

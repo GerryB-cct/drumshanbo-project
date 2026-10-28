@@ -1,0 +1,11 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Celtic knot">
+  <!-- PLACEHOLDER logo: a simple triquetra (trinity knot) with a circle.
+       To swap: replace this file, then run scripts/make_icons.ps1 to rebuild the PWA icons. -->
+  <circle cx="50" cy="50" r="49" fill="#1d4a2c"/>
+  <g transform="translate(0 10)" fill="none" stroke="#faf5e6" stroke-width="4.5" stroke-linejoin="round">
+    <circle cx="50" cy="50" r="27"/>
+    <path d="M50 70 A34.64 34.64 0 0 1 50 10 A34.64 34.64 0 0 1 50 70 Z"/>
+    <path d="M32.68 40 A34.64 34.64 0 0 1 84.64 70 A34.64 34.64 0 0 1 32.68 40 Z"/>
+    <path d="M67.32 40 A34.64 34.64 0 0 0 15.36 70 A34.64 34.64 0 0 0 67.32 40 Z"/>
+  </g>
+</svg>

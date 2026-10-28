@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Returned{% endblock %}
+{% block content %}
+<p class="success-mark" role="status">✓ Thank you!</p>
+<p class="confirm-title">{{ loan.book.title }}</p>
+<p>is marked as returned. The librarian will check it back onto the shelf.</p>
+<div class="big-actions">
+  <a class="btn big" href="{{ url_for('main.home') }}">Back to my books</a>
+  <a class="btn big secondary" href="{{ url_for('member.borrow_search') }}">Borrow a book</a>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+<div class="btn-row">
+  <a class="btn secondary" href="{{ url_for('admin.email_settings') }}">Edit email wording</a>
+  <a class="btn secondary" href="{{ url_for('admin.push') }}">Push notifications</a>
+</div>
+<form method="post" class="form-card" style="max-width:44rem">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <h2 style="margin-top:0">Lending rules</h2>
+  {% for key in ['loan_weeks', 'max_books', 'renewals_allowed', 'hold_days'] %}
+    <label for="{{ key }}">{{ labels[key] }}</label>
+    <input type="number" min="0" id="{{ key }}" name="{{ key }}" value="{{ current[key] }}" inputmode="numeric">
+  {% endfor %}
+  {% for key in bool_keys %}
+    <label class="check"><input type="checkbox" name="{{ key }}" value="1" {{ 'checked' if bools[key] }}> <span>{{ labels[key] }}</span></label>
+  {% endfor %}
+  <p class="hint">Re-borrowing is never allowed when someone else has asked for the book: it's held for them instead.</p>
+
+  <h2>Reminder emails</h2>
+  <p class="hint">Due today is always sent on the due date. After the final notice, no more automatic emails are sent.</p>
+  {% for key in ['remind_due_soon_days', 'remind_overdue1_days', 'remind_overdue2_days', 'remind_final_days'] %}
+    <label for="{{ key }}">{{ labels[key] }}</label>
+    <input type="number" min="0" id="{{ key }}" name="{{ key }}" value="{{ current[key] }}" inputmode="numeric">
+  {% endfor %}
+
+  <h2>Librarian notifications</h2>
+  <label for="librarian_email">Email address for new applications, returns, lost books and final notices</label>
+  <input type="email" id="librarian_email" name="librarian_email" value="{{ librarian_email }}">
+
+  <button class="btn block" type="submit" style="margin-top:1.25rem">Save settings</button>
+</form>
+
+<h2>Librarians (admins)</h2>
+<div class="table-wrap" style="max-width:44rem"><table>
+  <tr><th>Name</th><th>Email</th></tr>
+  {% for a in admins %}<tr><td><a href="{{ url_for('admin.member_detail', user_id=a.id) }}">{{ a.name }}</a></td><td>{{ a.email }}</td></tr>{% endfor %}
+</table></div>
+<div class="btn-row"><a class="btn" href="{{ url_for('admin.admin_create') }}">Create another admin</a></div>
+{% endblock %}

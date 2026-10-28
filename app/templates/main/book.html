@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('main.catalogue') }}">‹ Back to the library</a></p>
+{% if book.cover_url %}<img class="cover" src="{{ book.cover_url }}" alt="Cover of {{ book.title }}">{% endif %}
+<p class="confirm-title">{{ book.title }}</p>
+<p class="confirm-sub">{{ book.author or 'Unknown compiler' }} · {{ book.book_type | capitalize }}</p>
+<p><span class="pill {{ 'available' if book.public_status == 'Available' else 'out' }}">{{ book.public_status }}</span></p>
+{% if book.notes %}<p>{{ book.notes }}</p>{% endif %}
+<div class="notice">Members can borrow and request books.
+  <a href="{{ url_for('auth.login', next=url_for('member.borrow_confirm', book_id=book.id)) }}">Log in</a>
+  or <a href="{{ url_for('auth.apply') }}">become a member</a>.</div>
+{% endblock %}

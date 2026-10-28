@@ -1,0 +1,64 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import post_button %}
+{% block title %}Loans{% endblock %}
+{% block content %}
+<h1>Loans</h1>
+{% set badge = {'current': counts.out, 'overdue': counts.overdue, 'long': counts.long, 'awaiting': counts.awaiting,
+                'lost': counts.lost, 'requests': counts.requests + counts.holds} %}
+<div class="tabs">
+  {% for key, label in views.items() %}
+  <a href="{{ url_for('admin.loans', view=key) }}" class="{{ 'active' if key == view }}">{{ label }} <span class="pill">{{ badge[key] }}</span></a>
+  {% endfor %}
+</div>
+{% set back = url_for('admin.loans', view=view) %}
+
+{% if view == 'requests' %}
+<div class="table-wrap"><table>
+  <tr><th>Book</th><th>Requested by</th><th>Asked</th><th>Status</th><th>Held until</th><th></th></tr>
+  {% for r in items %}
+  <tr>
+    <td>{{ r.book.title }}</td>
+    <td><a href="{{ url_for('admin.member_detail', user_id=r.user_id) }}">{{ r.user.name }}</a></td>
+    <td>{{ r.created_on | short_date }}</td>
+    <td><span class="pill {{ r.status }}">{{ r.status.replace('_', ' ') }}</span></td>
+    <td>{{ r.hold_until | short_date }}</td>
+    <td>{{ post_button(url_for('admin.request_cancel', req_id=r.id), 'Cancel', 'btn secondary small', confirm='Cancel this request?') }}</td>
+  </tr>
+  {% else %}<tr><td colspan="6" class="muted">No active requests.</td></tr>{% endfor %}
+</table></div>
+
+{% else %}
+{% if view == 'long' %}<p class="muted">The final notice has been sent for these. No more automatic emails will go out.</p>{% endif %}
+<div class="table-wrap"><table>
+  <tr><th>Book</th><th>Member</th><th>Borrowed</th><th>Due</th>
+    {% if view == 'awaiting' %}<th>Returned</th><th>Damage note</th>{% elif view == 'lost' %}<th>Reported</th>{% else %}<th>Reminders sent</th>{% endif %}
+    <th></th></tr>
+  {% for l in items %}
+  <tr>
+    <td>{{ l.book.title }}</td>
+    <td><a href="{{ url_for('admin.member_detail', user_id=l.user_id) }}">{{ l.user.name }}</a><br><span class="small">{{ l.user.phone }}</span></td>
+    <td>{{ l.borrowed_on | short_date }}</td>
+    <td>{{ l.due_on | short_date }}{% if l.is_overdue(today) %}<br><span class="pill lost">{{ l.days_overdue(today) }} days overdue</span>{% endif %}</td>
+    {% if view == 'awaiting' %}
+      <td>{{ l.returned_on | short_date }}</td><td>{{ l.damage_note or '' }}</td>
+      <td><div class="btn-row">
+        {{ post_button(url_for('admin.loan_confirm', loan_id=l.id), 'Confirm on shelf', 'btn small', fields={'back': back}) }}
+        {{ post_button(url_for('admin.loan_not_received', loan_id=l.id), 'Not received', 'btn danger small',
+                       confirm='Mark as not received? The member will be emailed and the book goes back on their account.', fields={'back': back}) }}
+      </div></td>
+    {% elif view == 'lost' %}
+      <td>{{ l.lost_reported_on | short_date }}</td>
+      <td><div class="btn-row">
+        {{ post_button(url_for('admin.loan_lost_found', loan_id=l.id), 'Found: back on shelf', 'btn small', fields={'back': back}) }}
+        {{ post_button(url_for('admin.loan_lost_confirm', loan_id=l.id), 'Confirm lost', 'btn danger small',
+                       confirm='Close this loan as lost? The book stays hidden from the catalogue.', fields={'back': back}) }}
+      </div></td>
+    {% else %}
+      <td class="small">{{ l.stages_sent() | sort | join(', ') }}</td>
+      <td><a href="{{ url_for('admin.book_status', book_id=l.book_id) }}">Change status</a></td>
+    {% endif %}
+  </tr>
+  {% else %}<tr><td colspan="7" class="muted">Nothing here.</td></tr>{% endfor %}
+</table></div>
+{% endif %}
+{% endblock %}

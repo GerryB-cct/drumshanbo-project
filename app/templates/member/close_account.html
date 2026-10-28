@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Close my account{% endblock %}
+{% block content %}
+<h1>Close my account</h1>
+{% if has_books %}
+<div class="notice bad">You still have a book out (or one waiting to be checked in by the librarian).
+You can close your account once it's all sorted.</div>
+<p><a class="btn" href="{{ url_for('main.home') }}">Back to my books</a></p>
+{% else %}
+<p>If you close your account:</p>
+<ul>
+  <li>Your name, address, email and phone number are deleted.</li>
+  <li>Your past loans are kept for the library's records, but no longer linked to you.</li>
+  <li>You'll be logged out. To borrow again you'd need to apply again.</li>
+</ul>
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label class="check"><input type="checkbox" name="confirm" value="yes"> <span>Yes, I want to close my account</span></label>
+  <div class="big-actions">
+    <button class="btn big danger" type="submit">Close my account</button>
+    <a class="btn big secondary" href="{{ url_for('member.details') }}">Cancel</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

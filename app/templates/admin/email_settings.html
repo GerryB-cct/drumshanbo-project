@@ -1,0 +1,32 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Email wording{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.settings_page') }}">‹ Settings</a></p>
+<h1>Email wording</h1>
+<p>Words in curly brackets, like <code>{member_name}</code>, are filled in automatically when the email is sent.
+<code>{signature}</code> becomes "The Drumshanbo Traditional Irish Music Library".</p>
+{% for t in templates %}
+<details class="form-card" id="tpl-{{ t.name }}">
+  <summary>{{ t.label }}{% if t.customised %} <span class="pill on_hold" style="margin-left:.5rem">edited</span>{% endif %}</summary>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="name" value="{{ t.name }}">
+    <p class="hint">Placeholders: {% for p in t.placeholders %}<code>{{ '{' ~ p ~ '}' }}</code>{{ ', ' if not loop.last }}{% endfor %}</p>
+    <label for="subject-{{ t.name }}">Subject</label>
+    <input type="text" id="subject-{{ t.name }}" name="subject" value="{{ t.subject }}">
+    <label for="body-{{ t.name }}">Message</label>
+    <textarea id="body-{{ t.name }}" name="body" rows="12">{{ t.body }}</textarea>
+    <div class="btn-row">
+      <button class="btn" type="submit" name="action" value="save">Save</button>
+      {% if t.customised %}<button class="btn secondary" type="submit" name="action" value="reset">Reset to default</button>{% endif %}
+    </div>
+  </form>
+</details>
+{% endfor %}
+{% endblock %}
+{% block scripts %}
+<script>
+  // Re-open the template that was just saved.
+  if (location.hash) { var d = document.querySelector(location.hash); if (d && d.tagName === 'DETAILS') d.open = true; }
+</script>
+{% endblock %}

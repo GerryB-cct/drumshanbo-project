@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import due_text %}
+{% block title %}Return a book{% endblock %}
+{% block content %}
+<h1>Return a book</h1>
+{% if loans %}
+<p>Put the book in the returns box, then tap it below.</p>
+<ul class="list">
+  {% for loan in loans %}
+  {% set colour = loan.due_colour(today) %}
+  <li>
+    <a class="card loan-card {{ colour }}" href="{{ url_for('member.return_confirm', loan_id=loan.id) }}">
+      <div class="card-title">{{ loan.book.title }}</div>
+      <div class="due {{ colour }}">{{ due_text(loan, today) }}</div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>You don't have any books to return.</p>
+<p><a class="btn" href="{{ url_for('main.home') }}">Back to my books</a></p>
+{% endif %}
+{% endblock %}

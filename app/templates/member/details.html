@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}My details{% endblock %}
+{% block content %}
+<h1>My details</h1>
+<form method="post" action="{{ url_for('member.details') }}" class="form-card" novalidate>
+  {{ form.hidden_tag() }}
+  {{ field(form.name, autocomplete="name") }}
+  {{ field(form.address, autocomplete="street-address") }}
+  {{ field(form.email, autocomplete="email") }}
+  {{ field(form.phone, autocomplete="tel") }}
+  <button class="btn block" type="submit" style="margin-top:1rem">Save my details</button>
+</form>
+
+<h2>Change password</h2>
+<form method="post" action="{{ url_for('member.change_password') }}" class="form-card" novalidate>
+  {{ pw_form.hidden_tag() }}
+  {{ field(pw_form.current, autocomplete="current-password") }}
+  {{ field(pw_form.password, hint="At least 8 characters.", autocomplete="new-password") }}
+  {{ field(pw_form.confirm, autocomplete="new-password") }}
+  <button class="btn block" type="submit" style="margin-top:1rem">Change password</button>
+</form>
+
+<h2>Leaving the library</h2>
+<p><a class="btn secondary" href="{{ url_for('member.close_account') }}">Close my account</a></p>
+<p class="small"><a href="{{ url_for('main.privacy') }}">How we use your details</a></p>
+{% endblock %}

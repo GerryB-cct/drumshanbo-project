@@ -1,0 +1,52 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Match columns{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.book_import') }}">‹ Upload a different file</a></p>
+<h1>Match your columns</h1>
+<p>Your file has {{ total }} row{{ 's' if total != 1 }} of books. For each library field, choose the column in your file that holds it.</p>
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grid-2">
+    {% for field, label, required in fields %}
+    <div>
+      <label for="map_{{ field }}">{{ label }}{% if required %} (required){% endif %}</label>
+      <select id="map_{{ field }}" name="map_{{ field }}">
+        <option value="">— not in my file —</option>
+        {% for h in headers %}<option value="{{ loop.index0 }}" {{ 'selected' if mapping[field] == loop.index0 }}>{{ h or ('Column ' ~ loop.index) }}</option>{% endfor %}
+      </select>
+    </div>
+    {% endfor %}
+    <div>
+      <label for="default_type">Type to use when a row has none</label>
+      <select id="default_type" name="default_type">
+        {% for t in types %}<option value="{{ t }}" {{ 'selected' if t == default_type }}>{{ t }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn secondary" type="submit" name="action" value="preview">Update preview</button>
+    <button class="btn" type="submit" name="action" value="import">Import {{ total }} rows</button>
+  </div>
+</form>
+
+<h2>Preview (first 10 rows)</h2>
+{% if preview %}
+<div class="table-wrap"><table>
+  <tr><th>Row</th><th>Title</th><th>Author</th><th>Type</th><th>ISBN</th><th>Notes</th><th>Result</th></tr>
+  {% for p in preview %}
+  <tr>
+    <td>{{ p.line }}</td>
+    {% if p.data %}
+      <td>{{ p.data.title }}</td><td>{{ p.data.author }}</td><td>{{ p.data.book_type }}</td><td class="mono">{{ p.data.isbn or '' }}</td><td>{{ p.data.notes or '' }}</td>
+      <td><span class="pill available">OK</span></td>
+    {% else %}
+      <td colspan="5"></td><td><span class="pill lost">Skip: {{ p.error }}</span></td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+</table></div>
+<p class="hint">Rows with an ISBN or a title + author that's already in the catalogue will also be skipped when you import.</p>
+{% else %}
+<p class="muted">Choose the column that holds the title to see a preview.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Borrow a book{% endblock %}
+{% block content %}
+<h1>Borrow a book</h1>
+<form method="get" action="{{ url_for('member.borrow_search') }}" role="search">
+  <label for="q">Type part of the title or author</label>
+  <div class="search-row">
+    <input type="search" id="q" name="q" value="{{ q }}" placeholder="e.g. Leitrim fiddle" {{ 'autofocus' if not q }} enterkeyhint="search">
+    <button class="btn" type="submit">Search</button>
+  </div>
+</form>
+
+{% if q %}
+<h2>{{ results | length }} result{{ 's' if results | length != 1 }}</h2>
+<ul class="list">
+  {% for book in results %}
+  <li>
+    <a class="card" href="{{ url_for('member.borrow_confirm', book_id=book.id) }}">
+      <div class="card-title">{{ book.title }}</div>
+      <div class="card-meta">{{ book.author or 'Unknown compiler' }} ·
+        <span class="pill {{ 'available' if book.status == 'available' else 'out' }}">{{ 'Available' if book.status == 'available' else 'Out' }}</span></div>
+    </a>
+  </li>
+  {% else %}
+  <li class="muted">No books found. Try fewer words, or <a href="{{ url_for('main.catalogue') }}">browse the whole library</a>.</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

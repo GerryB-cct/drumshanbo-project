@@ -1,0 +1,15 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Edit {{ user.name }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.member_detail', user_id=user.id) }}">‹ {{ user.name }}</a></p>
+<h1>Edit details</h1>
+<form method="post" class="form-card" novalidate style="max-width:40rem">
+  {{ form.hidden_tag() }}
+  {{ field(form.name) }}
+  {{ field(form.address) }}
+  {{ field(form.email) }}
+  {{ field(form.phone) }}
+  <button class="btn block" type="submit" style="margin-top:1rem">Save</button>
+</form>
+{% endblock %}

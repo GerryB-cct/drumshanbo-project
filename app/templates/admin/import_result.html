@@ -1,0 +1,21 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Import finished{% endblock %}
+{% block content %}
+<h1>Import finished</h1>
+<div class="stats">
+  <div class="stat"><div class="num">{{ imported }}</div><div class="lbl">Books imported</div></div>
+  <div class="stat {{ 'alert' if skipped }}"><div class="num">{{ skipped | length }}</div><div class="lbl">Rows skipped</div></div>
+  <div class="stat"><div class="num">{{ total }}</div><div class="lbl">Rows in file</div></div>
+</div>
+{% if skipped %}
+<h2>Skipped rows</h2>
+<div class="table-wrap"><table>
+  <tr><th>Row in file</th><th>Why it was skipped</th></tr>
+  {% for line, reason in skipped %}<tr><td>{{ line }}</td><td>{{ reason }}</td></tr>{% endfor %}
+</table></div>
+{% endif %}
+<div class="btn-row">
+  <a class="btn" href="{{ url_for('admin.books') }}">See the books</a>
+  <a class="btn secondary" href="{{ url_for('admin.book_import') }}">Import another file</a>
+</div>
+{% endblock %}

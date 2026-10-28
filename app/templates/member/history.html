@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}My history{% endblock %}
+{% block content %}
+<h1>My history</h1>
+<p class="muted">Books you've borrowed in the last 2 years. Older records are deleted automatically.</p>
+{% set labels = {'on_loan': 'On loan', 'returned_pending': 'Returned, being checked', 'returned': 'Returned',
+                 'lost_reported': 'Reported lost', 'lost': 'Lost'} %}
+<ul class="list">
+  {% for loan in loans %}
+  <li class="card">
+    <div class="card-title">{{ loan.book.title }}</div>
+    <div class="card-meta">Borrowed {{ loan.borrowed_on | short_date }}
+      {% if loan.closed_on %}· back {{ loan.closed_on | short_date }}{% elif loan.returned_on %}· returned {{ loan.returned_on | short_date }}{% endif %}
+      · <span class="pill {{ loan.status }}">{{ labels.get(loan.status, loan.status) }}</span></div>
+  </li>
+  {% else %}
+  <li class="muted">No books yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

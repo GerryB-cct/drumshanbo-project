@@ -1,0 +1,28 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Check return{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.loans', view='awaiting') }}">‹ Awaiting check</a></p>
+<h1>Check a returned book</h1>
+<p class="confirm-title">{{ loan.book.title }}</p>
+<p>{{ loan.user.name }} · borrowed {{ loan.borrowed_on | short_date }} · due {{ loan.due_on | short_date }}
+  {% if loan.returned_on %}· marked returned {{ loan.returned_on | short_date }}{% endif %}</p>
+{% if loan.damage_note %}<div class="notice"><strong>Damage note:</strong> {{ loan.damage_note }}</div>{% endif %}
+{% if req and req.status == 'waiting' %}<div class="notice good">Someone has asked for this book. Confirming it on the shelf will hold it for them and email them.</div>{% endif %}
+
+{% if loan.status == 'returned_pending' %}
+<div class="big-actions">
+  <form method="post" action="{{ url_for('admin.loan_confirm', loan_id=loan.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="back" value="{{ url_for('admin.loans', view='awaiting') }}">
+    <button class="btn big" type="submit">Confirm on shelf</button>
+  </form>
+  <form method="post" action="{{ url_for('admin.loan_not_received', loan_id=loan.id) }}" data-confirm="Mark as not received? The member will be emailed and the book goes back on their account.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="back" value="{{ url_for('admin.loans', view='awaiting') }}">
+    <button class="btn big danger" type="submit">Not received</button>
+  </form>
+</div>
+{% else %}
+<div class="notice good">This return has already been dealt with (now: {{ loan.status.replace('_', ' ') }}).</div>
+{% endif %}
+{% endblock %}

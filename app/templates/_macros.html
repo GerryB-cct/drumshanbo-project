@@ -1,0 +1,40 @@
+{% macro field(f, hint=None, autocomplete=None) %}
+  <label for="{{ f.id }}">{{ f.label.text }}</label>
+  {% if autocomplete %}{{ f(autocomplete=autocomplete, **({'aria-describedby': f.id ~ '-hint'} if hint else {})) }}{% else %}{{ f(**({'aria-describedby': f.id ~ '-hint'} if hint else {})) }}{% endif %}
+  {% if hint %}<p class="hint" id="{{ f.id }}-hint">{{ hint }}</p>{% endif %}
+  {% for e in f.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+{% endmacro %}
+
+{% macro checkbox(f, extra=None) %}
+  <label class="check" for="{{ f.id }}">{{ f() }} <span>{{ f.label.text }}{% if extra %} {{ extra }}{% endif %}</span></label>
+  {% for e in f.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+{% endmacro %}
+
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro post_button(action, label, cls="btn", confirm=None, fields=None) %}
+  <form method="post" action="{{ action }}" class="inline"{% if confirm %} data-confirm="{{ confirm }}"{% endif %}>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if fields %}{% for k, v in fields.items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}{% endif %}
+    <button type="submit" class="{{ cls }}">{{ label }}</button>
+  </form>
+{% endmacro %}
+
+{% macro due_text(loan, today) -%}
+  {%- set days = (loan.due_on - today).days -%}
+  {%- if days < 0 -%}Overdue: was due {{ loan.due_on | nice_date }} ({{ -days }} day{{ 's' if -days != 1 }} ago)
+  {%- elif days == 0 -%}Due back today
+  {%- elif days == 1 -%}Due back tomorrow ({{ loan.due_on | nice_date }})
+  {%- else -%}Due back {{ loan.due_on | nice_date }}
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro pager(pagination, endpoint) %}
+  {% if pagination.pages > 1 %}
+  <nav class="pager" aria-label="Pages">
+    {% if pagination.has_prev %}<a class="btn secondary small" href="{{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}">‹ Previous</a>{% endif %}
+    <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    {% if pagination.has_next %}<a class="btn secondary small" href="{{ url_for(endpoint, page=pagination.next_num, **kwargs) }}">Next ›</a>{% endif %}
+  </nav>
+  {% endif %}
+{% endmacro %}

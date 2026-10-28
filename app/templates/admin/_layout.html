@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block wrapclass %}wide{% endblock %}
+{% block subnav %}
+{% set ep = request.endpoint or '' %}
+<nav class="admin-nav" aria-label="Librarian">
+  <div class="wrap wide">
+    <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if ep == 'admin.dashboard' }}">Dashboard</a>
+    <a href="{{ url_for('admin.applications') }}" class="{{ 'active' if 'application' in ep }}">Applications</a>
+    <a href="{{ url_for('admin.members') }}" class="{{ 'active' if 'member' in ep }}">Members</a>
+    <a href="{{ url_for('admin.books') }}" class="{{ 'active' if 'book' in ep or 'isbn' in ep }}">Books</a>
+    <a href="{{ url_for('admin.loans') }}" class="{{ 'active' if 'loan' in ep or 'request' in ep }}">Loans</a>
+    <a href="{{ url_for('admin.settings_page') }}" class="{{ 'active' if 'settings' in ep or 'admin_create' in ep }}">Settings</a>
+    <a href="{{ url_for('admin.push') }}" class="{{ 'active' if 'push' in ep }}">Notifications</a>
+  </div>
+</nav>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Librarian dashboard{% endblock %}
+{% block content %}
+<h1>Librarian dashboard</h1>
+<div class="stats">
+  <a class="stat {{ 'alert' if counts.pending }}" href="{{ url_for('admin.applications') }}"><div class="num">{{ counts.pending }}</div><div class="lbl">Pending applications</div></a>
+  <a class="stat {{ 'alert' if counts.awaiting }}" href="{{ url_for('admin.loans', view='awaiting') }}"><div class="num">{{ counts.awaiting }}</div><div class="lbl">Awaiting check</div></a>
+  <a class="stat" href="{{ url_for('admin.loans', view='current') }}"><div class="num">{{ counts.out }}</div><div class="lbl">Books out</div></a>
+  <a class="stat {{ 'alert' if counts.overdue }}" href="{{ url_for('admin.loans', view='overdue') }}"><div class="num">{{ counts.overdue }}</div><div class="lbl">Overdue</div></a>
+  <a class="stat {{ 'alert' if counts.long }}" href="{{ url_for('admin.loans', view='long') }}"><div class="num">{{ counts.long }}</div><div class="lbl">Long overdue</div></a>
+  <a class="stat" href="{{ url_for('admin.loans', view='requests') }}"><div class="num">{{ counts.requests }}</div><div class="lbl">Active requests</div></a>
+  <a class="stat" href="{{ url_for('admin.loans', view='requests') }}"><div class="num">{{ counts.holds }}</div><div class="lbl">Books on hold</div></a>
+  <a class="stat {{ 'alert' if counts.lost }}" href="{{ url_for('admin.loans', view='lost') }}"><div class="num">{{ counts.lost }}</div><div class="lbl">Lost reports</div></a>
+</div>
+
+<h2>Quick links</h2>
+<div class="btn-row">
+  <a class="btn" href="{{ url_for('admin.book_new') }}">Add a book</a>
+  <a class="btn secondary" href="{{ url_for('admin.book_import') }}">Import books (CSV)</a>
+  <a class="btn secondary" href="{{ url_for('admin.export', kind='members') }}">Export members</a>
+  <a class="btn secondary" href="{{ url_for('admin.export', kind='books') }}">Export books</a>
+  <a class="btn secondary" href="{{ url_for('admin.export', kind='loans') }}">Export loans</a>
+</div>
+
+{% if TEST_MODE %}
+<section class="form-card test-tools">
+  <h2 style="margin-top:0">Test tools</h2>
+  <p>Today is treated as <strong>{{ TODAY | nice_date }}</strong>{% if PRETEND_DATE %} (pretend date){% else %} (real date){% endif %}.</p>
+  <form method="post" action="{{ url_for('admin.pretend_today') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="pretend">Pretend today is…</label>
+    <div class="search-row">
+      <input type="date" id="pretend" name="date" value="{{ TODAY.isoformat() }}">
+      <button class="btn" type="submit">Set date</button>
+      {% if PRETEND_DATE %}<button class="btn secondary" type="submit" name="action" value="clear">Use real date</button>{% endif %}
+    </div>
+  </form>
+  <div class="btn-row">
+    {% for d in [1, 3, 7, 14] %}
+    <form method="post" action="{{ url_for('admin.shift_days') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="days" value="{{ d }}">
+      <button class="btn secondary small" type="submit">+{{ d }} day{{ 's' if d > 1 }}</button>
+    </form>
+    {% endfor %}
+  </div>
+  <div class="btn-row">
+    <form method="post" action="{{ url_for('admin.run_reminders') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn" type="submit">Run reminders now</button>
+    </form>
+    <form method="post" action="{{ url_for('admin.push_test') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="back" value="{{ url_for('admin.dashboard') }}">
+      <button class="btn secondary" type="submit">Send test push</button>
+    </form>
+    <a class="btn secondary" href="http://localhost:8025" target="_blank" rel="noopener">Open Mailpit inbox</a>
+  </div>
+  <p class="hint">"Run reminders now" runs exactly the same code as <code>flask send-reminders</code>: reminder emails, hold expiry and GDPR clean-up.</p>
+</section>
+{% endif %}
+{% endblock %}

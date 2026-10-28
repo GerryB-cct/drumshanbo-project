@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Privacy notice{% endblock %}
+{% block content %}
+<h1>Privacy notice</h1>
+<div class="notice">PLACEHOLDER TEXT: replace with the library's approved privacy notice before going live.</div>
+
+<h2>Who we are</h2>
+<p>The data controller is {{ LIBRARY_NAME }}. Our contact for anything about your data is the librarian:
+<a href="mailto:{{ librarian_email }}">{{ librarian_email }}</a>.</p>
+
+<h2>What we collect</h2>
+<ul>
+  <li>Your name, address, email address and phone number.</li>
+  <li>Records of the books you borrow and return (your loan records), and books you ask for.</li>
+  <li>The date and time you agreed to this notice.</li>
+</ul>
+
+<h2>Why we collect it</h2>
+<p>To run the library: to know who has which book, to send you reminders when a book is due
+or overdue, to tell you when a book you asked for is back, and to contact you about your membership.
+We do not use your details for anything else, and we never sell or share them.</p>
+<p>When you ask for a book that someone else has, we email them to say "someone is looking for
+this book". We never tell them who you are, and we never tell you who has the book.</p>
+
+<h2>How long we keep it</h2>
+<ul>
+  <li>Loan history is kept for 2 years, then deleted automatically.</li>
+  <li>Applications that are not approved are deleted after 30 days.</li>
+  <li>If you close your account, your personal details are deleted. Past loan records are kept
+    for up to 2 years but are no longer linked to you (they show as "former member").</li>
+</ul>
+
+<h2>Your rights</h2>
+<p>You can see and change your details at any time under "My details", and you can close your
+account there. You can also ask the librarian for a copy of your data, or ask for it to be corrected or deleted.
+You have the right to complain to the Data Protection Commission (dataprotection.ie).</p>
+{% endblock %}

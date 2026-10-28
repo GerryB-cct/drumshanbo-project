@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "_macros.html" import due_text %}
+{% block content %}
+<section class="welcome">
+  <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Library logo: a Celtic knot">
+  <p class="irish" lang="ga">{{ WELCOME_LINE }}</p>
+  <p class="english">Hello, {{ current_user.first_name }}</p>
+</section>
+
+{% if current_user.is_suspended %}
+<div class="notice bad">Your membership is paused at the moment, so you can't borrow or request books.
+You can still see your books here. Please speak to the librarian.</div>
+{% endif %}
+
+<h2>My books</h2>
+{% if holds %}
+<ul class="list" style="margin-bottom:.6rem">
+  {% for r in holds %}
+  <li class="card loan-card green">
+    <div class="card-title">{{ r.book.title }}</div>
+    <div class="due green">Held for you until {{ r.hold_until | nice_date }}</div>
+    <div class="btn-row"><a class="btn small" href="{{ url_for('member.borrow_confirm', book_id=r.book.id) }}">Borrow it now</a></div>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% if loans %}
+<ul class="list">
+  {% for loan in loans %}
+    {% if loan.status == LOAN_ON_LOAN %}
+      {% set colour = loan.due_colour(today, amber_days) %}
+      <li class="card loan-card {{ colour }}">
+        <div class="card-title">{{ loan.book.title }}</div>
+        <div class="due {{ colour }}">{{ due_text(loan, today) }}</div>
+        <div class="btn-row">
+          <a class="btn small secondary" href="{{ url_for('member.return_confirm', loan_id=loan.id) }}">Return this book</a>
+          <a class="btn small secondary" href="{{ url_for('member.lost_confirm', loan_id=loan.id) }}">I've lost this book</a>
+          {% if renewals_allowed and loan.renewals < renewals_allowed and not loan.is_overdue(today) %}
+          <form method="post" action="{{ url_for('member.renew', loan_id=loan.id) }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn small secondary" type="submit">Keep it longer</button>
+          </form>
+          {% endif %}
+        </div>
+      </li>
+    {% elif loan.status == 'returned_pending' %}
+      <li class="card loan-card grey">
+        <div class="card-title">{{ loan.book.title }}</div>
+        <div class="due grey">Returned. Waiting for the librarian to check it in.</div>
+      </li>
+    {% elif loan.status == 'lost_reported' %}
+      <li class="card loan-card grey">
+        <div class="card-title">{{ loan.book.title }}</div>
+        <div class="due grey">Reported lost. The librarian will be in touch.</div>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+{% elif not holds %}
+<p class="muted">You don't have any books out at the moment.</p>
+{% endif %}
+{% for r in waiting %}
+<p class="small muted">You've asked for "{{ r.book.title }}". We'll email you when it's back.</p>
+{% endfor %}
+
+<div class="big-actions">
+  <a class="btn big" href="{{ url_for('member.borrow_search') }}">Borrow a book</a>
+  <a class="btn big" href="{{ url_for('member.return_list') }}">Return a book</a>
+</div>
+
+<div class="home-links">
+  <a class="btn secondary" href="{{ url_for('main.catalogue') }}">Browse the library</a>
+  <a class="btn secondary" href="{{ url_for('member.history') }}">My history</a>
+  <a class="btn secondary" href="{{ url_for('member.details') }}">My details</a>
+  {% if current_user.is_admin %}<a class="btn secondary" href="{{ url_for('admin.dashboard') }}">Librarian area</a>{% endif %}
+</div>
+{% endblock %}

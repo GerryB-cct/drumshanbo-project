@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Lost book{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('main.home') }}">‹ Back</a></p>
+<h1>Have you lost this book?</h1>
+<p class="confirm-title">{{ loan.book.title }}</p>
+<p>If you can't find it, let us know. The librarian will be in touch to sort it out. There's no automatic fine.</p>
+<p>If you find it later, just bring it back to the library.</p>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="big-actions">
+    <button class="btn big danger" type="submit">Yes, I've lost it</button>
+    <a class="btn big secondary" href="{{ url_for('main.home') }}">No, go back</a>
+  </div>
+</form>
+{% endblock %}
