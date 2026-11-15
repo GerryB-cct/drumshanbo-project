@@ -22,7 +22,9 @@ def env_bool(name, default=False):
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-only-not-secret"
+    # No fallback: a known default key would let anyone forge session/CSRF cookies.
+    # create_app() refuses to start without one unless TEST_MODE is on.
+    SECRET_KEY = os.environ.get("SECRET_KEY") or None
     BASE_URL = os.environ.get("BASE_URL") or "http://localhost:5000"
     TEST_MODE = env_bool("TEST_MODE", False)
 

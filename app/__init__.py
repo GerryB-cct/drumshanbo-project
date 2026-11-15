@@ -1,5 +1,6 @@
 import logging
 import os
+import secrets
 
 from flask import Flask, render_template
 
@@ -11,6 +12,15 @@ from .extensions import csrf, db, login_manager, mail, migrate
 def create_app(config_class=Config):
     app = Flask(__name__, instance_path=app_config.INSTANCE_DIR, instance_relative_config=False)
     app.config.from_object(config_class)
+    if not app.config.get("SECRET_KEY"):
+        if not app.config.get("TEST_MODE"):
+            raise RuntimeError(
+                "SECRET_KEY is not set. Add a long random SECRET_KEY to .env "
+                '(python -c "import secrets; print(secrets.token_hex(32))").'
+            )
+        # TEST_MODE only: random per-process key, so it can't be guessed.
+        # Sessions won't survive a restart, which is fine for testing.
+        app.config["SECRET_KEY"] = secrets.token_hex(32)
     os.makedirs(app.instance_path, exist_ok=True)
     logging.basicConfig(level=logging.INFO)
 
