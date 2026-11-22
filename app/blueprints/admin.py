@@ -627,11 +627,26 @@ def email_settings():
 # CSV export
 # --------------------------------------------------------------------------
 
+_FORMULA_STARTS = ("=", "+", "-", "@")
+
+
+def _csv_safe(value):
+    """Stop spreadsheet apps running a cell as a formula (CSV injection).
+
+    A member could type a name or address like "=HYPERLINK(...)"; Excel would
+    run it when the librarian opens the export. A leading ' makes it plain text.
+    Only text is changed: numbers and dates are written as they are.
+    """
+    if isinstance(value, str) and value.startswith(_FORMULA_STARTS):
+        return "'" + value
+    return value
+
+
 def _csv_response(filename, header, rows):
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(header)
-    writer.writerows(rows)
+    writer.writerows([_csv_safe(cell) for cell in row] for row in rows)
     return Response(
         "﻿" + buf.getvalue(),  # BOM so Excel reads the Irish fadas correctly
         mimetype="text/csv",

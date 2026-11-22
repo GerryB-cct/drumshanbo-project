@@ -197,6 +197,32 @@ def test_exports(client, app):
         assert resp.status_code == 200 and resp.mimetype == "text/csv"
 
 
+def test_exports_neutralise_formulas(client, app):
+    import csv
+
+    make_user("Lib", email="lib@example.com", role="admin")
+    evil = make_user('=HYPERLINK("http://evil.example","Click")', email="evil@example.com")
+    evil.phone = "+353 71 123 4567"
+    evil.address = "@SUM(A1)"
+    make_book("-2+3 Reels").notes = "Plain note"
+    db.session.commit()
+    login(client, "lib@example.com")
+
+    def rows(kind):
+        text = client.get(f"/admin/export/{kind}.csv").get_data(as_text=True).lstrip("﻿")
+        return list(csv.DictReader(io.StringIO(text)))
+
+    member = next(r for r in rows("members") if r["email"] == "evil@example.com")
+    assert member["name"] == "'=HYPERLINK(\"http://evil.example\",\"Click\")"
+    assert member["phone"] == "'+353 71 123 4567"
+    assert member["address"] == "'@SUM(A1)"
+
+    book = rows("books")[0]
+    assert book["title"] == "'-2+3 Reels"
+    assert book["notes"] == "Plain note"  # ordinary text is left alone
+    assert book["id"].isdigit()  # numbers aren't touched
+
+
 def test_password_reset(client, app, outbox):
     make_user(email="m@example.com")
     client.post("/account/forgot", data={"email": "m@example.com"})
