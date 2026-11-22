@@ -1,0 +1,48 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import post_button %}
+{% block title %}{{ user.name }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('admin.members') }}">‹ Members</a></p>
+<h1>{{ user.name }} <span class="pill {{ user.status }}">{{ user.status }}</span>{% if user.is_admin %} <span class="pill">admin</span>{% endif %}</h1>
+<div class="form-card">
+  <p style="margin-top:0">{{ user.email }} · {{ user.phone }}<br>{{ user.address }}</p>
+  <p class="small muted">Applied {{ user.applied_on | short_date }} · approved {{ user.approved_on | short_date }}
+    · consent {{ user.consent_at.strftime('%d %b %Y %H:%M') if user.consent_at else '—' }}</p>
+  <div class="btn-row">
+    <a class="btn secondary" href="{{ url_for('admin.member_edit', user_id=user.id) }}">Edit details</a>
+    {% if user.status == 'active' and user.id != current_user.id %}
+      {{ post_button(url_for('admin.member_suspend', user_id=user.id), 'Suspend', 'btn danger',
+                     confirm='Suspend ' ~ user.name ~ '? They will not be able to borrow or request.') }}
+    {% elif user.status == 'suspended' %}
+      {{ post_button(url_for('admin.member_reactivate', user_id=user.id), 'Reactivate') }}
+    {% endif %}
+  </div>
+</div>
+
+<h2>Books and history</h2>
+<div class="table-wrap"><table>
+  <tr><th>Book</th><th>Borrowed</th><th>Due</th><th>Status</th><th>Reminders sent</th><th></th></tr>
+  {% for l in loans %}
+  <tr>
+    <td>{{ l.book.title }}{% if l.damage_note %}<br><span class="small">Damage: {{ l.damage_note }}</span>{% endif %}</td>
+    <td>{{ l.borrowed_on | short_date }}</td>
+    <td>{{ l.due_on | short_date }}{% if l.is_overdue(today) %} <span class="pill lost">{{ l.days_overdue(today) }}d overdue</span>{% endif %}</td>
+    <td><span class="pill {{ l.status }}">{{ l.status.replace('_', ' ') }}</span></td>
+    <td class="small">{{ l.stages_sent() | sort | join(', ') }}</td>
+    <td>{% if l.status == 'returned_pending' %}<a href="{{ url_for('admin.loan_check', loan_id=l.id) }}">Check</a>{% endif %}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">No loans.</td></tr>
+  {% endfor %}
+</table></div>
+
+{% if reqs %}
+<h2>Requests</h2>
+<div class="table-wrap"><table>
+  <tr><th>Book</th><th>Asked</th><th>Status</th><th>Held until</th></tr>
+  {% for r in reqs %}
+  <tr><td>{{ r.book.title }}</td><td>{{ r.created_on | short_date }}</td><td><span class="pill {{ r.status }}">{{ r.status.replace('_', ' ') }}</span></td><td>{{ r.hold_until | short_date }}</td></tr>
+  {% endfor %}
+</table></div>
+{% endif %}
+{% endblock %}

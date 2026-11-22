@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="welcome">
+  <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Library logo: a Celtic knot">
+  <p class="irish" lang="ga">{{ WELCOME_LINE }}</p>
+  <p class="english">Welcome to the Drumshanbo Traditional Irish Music Library</p>
+</section>
+
+<p>We lend tune books, songbooks and reference books on Irish traditional music to our members.
+Membership is free for adults.</p>
+
+<div class="big-actions">
+  <a class="btn big" href="{{ url_for('main.catalogue') }}">Browse the library</a>
+  <a class="btn big secondary" href="{{ url_for('auth.login') }}">Log in</a>
+  <a class="btn big secondary" href="{{ url_for('auth.apply') }}">Become a member</a>
+</div>
+{% endblock %}

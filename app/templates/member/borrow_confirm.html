@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<p><a href="javascript:history.back()">‹ Back</a></p>
+{% if book.cover_url %}<img class="cover" src="{{ book.cover_url }}" alt="Cover of {{ book.title }}">{% endif %}
+<p class="confirm-title">{{ book.title }}</p>
+<p class="confirm-sub">{{ book.author or 'Unknown compiler' }} · {{ book.book_type | capitalize }}</p>
+{% if book.notes %}<p>{{ book.notes }}</p>{% endif %}
+
+{% if not problem %}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn big" type="submit">Borrow</button>
+  </form>
+  <p class="hint">You can keep it for {{ loan_weeks }} weeks. We'll email you before it's due back.</p>
+{% elif can_request %}
+  <div class="notice" role="status">This book is out at the moment. You can ask for it, and we'll hold it
+    for you for {{ hold_days }} days when it comes back.</div>
+  <form method="post" action="{{ url_for('member.request_book', book_id=book.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn big" type="submit">Request this book</button>
+  </form>
+{% else %}
+  <div class="notice bad" role="alert">{{ request_problem or problem }}</div>
+  <div class="btn-row"><a class="btn secondary" href="{{ url_for('main.home') }}">Back to my books</a></div>
+{% endif %}
+{% endblock %}

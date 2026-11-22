@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field, checkbox %}
+{% block title %}Become a member{% endblock %}
+{% block content %}
+<h1>Become a member</h1>
+<p>Membership is free and open to adults. Fill in your details and the librarian will approve your application.</p>
+<form method="post" class="form-card" novalidate>
+  {{ form.hidden_tag() }}
+  {{ field(form.name, autocomplete="name") }}
+  {{ field(form.address, autocomplete="street-address") }}
+  {{ field(form.email, autocomplete="email") }}
+  {{ field(form.phone, autocomplete="tel") }}
+  {{ field(form.password, hint="At least 8 characters.", autocomplete="new-password") }}
+  {{ field(form.confirm, autocomplete="new-password") }}
+  {{ checkbox(form.adult) }}
+  <label class="check" for="{{ form.consent.id }}">{{ form.consent() }}
+    <span>I agree to the library using my details as described in the
+      <a href="{{ url_for('main.privacy') }}" target="_blank" rel="noopener">privacy notice</a> (opens in a new tab)</span></label>
+  {% for e in form.consent.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+  <button class="btn block" type="submit">Send my application</button>
+</form>
+{% endblock %}

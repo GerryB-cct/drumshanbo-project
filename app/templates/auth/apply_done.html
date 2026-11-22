@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Application sent{% endblock %}
+{% block content %}
+<h1>Thank you!</h1>
+<p class="success-mark">Your application has been sent.</p>
+<p>We've emailed you to confirm we received it. The librarian will look at it soon, and we'll
+email you again as soon as you're approved. Then you can log in and borrow books.</p>
+<p><a class="btn" href="{{ url_for('main.catalogue') }}">Browse the library</a></p>
+{% endblock %}

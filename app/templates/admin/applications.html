@@ -1,0 +1,38 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<h1>Membership applications</h1>
+{% for u in pending %}
+<section class="form-card" id="app-{{ u.id }}">
+  <h2 style="margin-top:0">{{ u.name }}</h2>
+  <p>{{ u.email }} · {{ u.phone }}<br>{{ u.address }}</p>
+  <p class="small muted">Applied {{ u.applied_on | nice_date }} · confirmed 18 or over: {{ 'yes' if u.adult_confirmed else 'no' }}
+    · privacy consent {{ u.consent_at.strftime('%d %b %Y %H:%M') if u.consent_at else 'missing' }}</p>
+  <div class="grid-2">
+    <form method="post" action="{{ url_for('admin.approve', user_id=u.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn block" type="submit">Approve</button>
+    </form>
+    <form method="post" action="{{ url_for('admin.reject', user_id=u.id) }}" data-confirm="Reject this application? The applicant will be emailed.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="reason-{{ u.id }}" style="margin-top:0">Reason (optional, included in the email)</label>
+      <input type="text" id="reason-{{ u.id }}" name="reason" maxlength="1000">
+      <button class="btn danger block" type="submit" style="margin-top:.5rem">Reject</button>
+    </form>
+  </div>
+</section>
+{% else %}
+<p class="muted">No applications waiting.</p>
+{% endfor %}
+
+{% if rejected %}
+<h2>Recently rejected</h2>
+<p class="muted small">These are deleted automatically 30 days after rejection.</p>
+<div class="table-wrap"><table>
+  <tr><th>Name</th><th>Rejected</th><th>Reason</th></tr>
+  {% for u in rejected %}
+  <tr><td>{{ u.name }}</td><td>{{ u.rejected_on | short_date }}</td><td>{{ u.reject_reason or '' }}</td></tr>
+  {% endfor %}
+</table></div>
+{% endif %}
+{% endblock %}

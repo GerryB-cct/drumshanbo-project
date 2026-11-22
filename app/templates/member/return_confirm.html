@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Return {{ loan.book.title }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('member.return_list') }}">‹ Back</a></p>
+<p>You're returning:</p>
+<p class="confirm-title">{{ loan.book.title }}</p>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="damage_note">Any damage? (optional note)</label>
+  <textarea id="damage_note" name="damage_note" maxlength="1000" placeholder="e.g. a page is torn"></textarea>
+  <p class="hint">Leave this empty if the book is fine.</p>
+  <div class="big-actions">
+    <button class="btn big" type="submit">Yes, I've returned it</button>
+    <a class="btn big secondary" href="{{ url_for('main.home') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

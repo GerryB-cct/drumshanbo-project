@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Request sent{% endblock %}
+{% block content %}
+<p class="success-mark" role="status">✓ Request sent</p>
+<p class="confirm-title">{{ book.title }}</p>
+<p>We've let the person who has it know that someone is looking for it. We don't tell them who you are.</p>
+<p>When it's back on the shelf we'll email you, and hold it just for you for {{ hold_days }} days.</p>
+<div class="big-actions">
+  <a class="btn big" href="{{ url_for('main.home') }}">Back to my books</a>
+</div>
+{% endblock %}

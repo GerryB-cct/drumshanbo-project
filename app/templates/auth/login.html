@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field, checkbox %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<h1>Log in</h1>
+<form method="post" class="form-card" novalidate>
+  {{ form.hidden_tag() }}
+  {{ field(form.email, autocomplete="email") }}
+  {{ field(form.password, autocomplete="current-password") }}
+  {{ checkbox(form.remember) }}
+  <button class="btn block" type="submit">Log in</button>
+</form>
+<p><a href="{{ url_for('auth.forgot') }}">Forgotten your password?</a></p>
+<p>Not a member yet? <a href="{{ url_for('auth.apply') }}">Apply to join</a>. It's free.</p>
+
+{% if TEST_MODE %}
+<div class="form-card test-tools">
+  <h2 style="margin-top:0">Test mode shortcuts</h2>
+  <div class="btn-row">
+    <form method="post" action="{{ url_for('auth.test_login', who='member') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn" type="submit">Log in as member</button>
+    </form>
+    <form method="post" action="{{ url_for('auth.test_login', who='librarian') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn" type="submit">Log in as librarian</button>
+    </form>
+  </div>
+  <p class="hint">Other test accounts (password <code>password</code>): liam.cryan@example.com (suspended),
+    grainne.mckiernan@example.com (3 books out), padraig.moran@example.com (overdue).</p>
+</div>
+{% endif %}
+{% endblock %}

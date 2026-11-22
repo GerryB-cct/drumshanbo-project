@@ -1,0 +1,40 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import pager %}
+{% block title %}Books{% endblock %}
+{% block content %}
+<h1>Books</h1>
+<div class="btn-row">
+  <a class="btn" href="{{ url_for('admin.book_new') }}">Add a book</a>
+  <a class="btn secondary" href="{{ url_for('admin.book_import') }}">Import from CSV</a>
+  <a class="btn secondary" href="{{ url_for('admin.export', kind='books') }}">Export to CSV</a>
+</div>
+<form method="get" class="form-card" role="search">
+  <label for="q" style="margin-top:0">Search title, author or ISBN</label>
+  <div class="search-row">
+    <input type="search" id="q" name="q" value="{{ q }}">
+    <select name="status" aria-label="Status">
+      <option value="">Any status</option>
+      {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s.replace('_', ' ') }}</option>{% endfor %}
+    </select>
+    <button class="btn" type="submit">Search</button>
+  </div>
+</form>
+<p class="muted">{{ pagination.total }} book{{ 's' if pagination.total != 1 }}</p>
+<div class="table-wrap"><table>
+  <tr><th>Title</th><th>Author / compiler</th><th>Type</th><th>Status</th><th>Has it</th><th></th></tr>
+  {% for b in pagination.items %}
+  {% set loan = b.open_loan() %}
+  <tr>
+    <td><a href="{{ url_for('admin.book_edit', book_id=b.id) }}">{{ b.title }}</a>{% if b.isbn %}<br><span class="mono">{{ b.isbn }}</span>{% endif %}</td>
+    <td>{{ b.author }}</td>
+    <td>{{ b.book_type }}</td>
+    <td><span class="pill {{ b.status }}">{{ b.status.replace('_', ' ') }}</span></td>
+    <td>{% if loan %}<a href="{{ url_for('admin.member_detail', user_id=loan.user_id) }}">{{ loan.user.name }}</a>{% endif %}</td>
+    <td><a href="{{ url_for('admin.book_status', book_id=b.id) }}">Change status</a></td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">No books found.</td></tr>
+  {% endfor %}
+</table></div>
+{{ pager(pagination, 'admin.books', q=q, status=status) }}
+{% endblock %}

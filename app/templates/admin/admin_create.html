@@ -1,0 +1,16 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import field %}
+{% block title %}New librarian{% endblock %}
+{% block content %}
+<h1>Create a librarian (admin) account</h1>
+<p>Admins can do everything in the librarian area, including creating other admins.</p>
+<form method="post" class="form-card" novalidate style="max-width:40rem">
+  {{ form.hidden_tag() }}
+  {{ field(form.name) }}
+  {{ field(form.address) }}
+  {{ field(form.email) }}
+  {{ field(form.phone) }}
+  {{ field(form.password, hint="At least 8 characters. Give it to them in person; they can change it under My details.", autocomplete="new-password") }}
+  <button class="btn block" type="submit" style="margin-top:1rem">Create admin</button>
+</form>
+{% endblock %}

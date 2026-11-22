@@ -1,0 +1,34 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import post_button %}
+{% block title %}Push notifications{% endblock %}
+{% block content %}
+<h1>Push notifications</h1>
+<p>Get a notification on this phone or computer when someone applies to join or returns a book.
+Turn it on separately on each device you use.</p>
+
+{% if not vapid_public_key %}
+<div class="notice bad">Push isn't set up yet. On the server, run <code>flask generate-vapid</code>, paste the two lines into
+<code>.env</code> and restart the app.</div>
+{% else %}
+<div class="btn-row">
+  <button class="btn" type="button" id="push-enable" data-key="{{ vapid_public_key }}" data-url="{{ url_for('admin.push_subscribe') }}">Enable notifications on this device</button>
+  <form method="post" action="{{ url_for('admin.push_test') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn secondary" type="submit">Send test push</button>
+  </form>
+</div>
+<div id="push-status" role="status" aria-live="polite"></div>
+<div class="notice small"><strong>iPhone / iPad:</strong> notifications only work after you add this app to your Home Screen
+(Share → Add to Home Screen, iOS 16.4 or later). Then open it from the Home Screen icon and tap "Enable notifications" there.</div>
+{% endif %}
+
+<h2>Your devices</h2>
+<div class="table-wrap"><table>
+  <tr><th>Device</th><th>Added</th><th></th></tr>
+  {% for s in subs %}
+  <tr><td class="small">{{ s.device_label or 'Unknown device' }}</td><td>{{ s.created_at.strftime('%d %b %Y') }}</td>
+    <td>{{ post_button(url_for('admin.push_remove', sub_id=s.id), 'Remove', 'btn secondary small') }}</td></tr>
+  {% else %}<tr><td colspan="3" class="muted">No devices yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/push.js') }}"></script>{% endblock %}

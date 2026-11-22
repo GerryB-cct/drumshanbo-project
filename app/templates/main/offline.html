@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Offline{% endblock %}
+{% block content %}
+<h1>You're offline</h1>
+<p>The library app needs an internet connection. Please check your connection and try again.</p>
+<p><a class="btn" href="{{ url_for('main.home') }}">Try again</a></p>
+{% endblock %}

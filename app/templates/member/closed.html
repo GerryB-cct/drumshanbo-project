@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Account closed{% endblock %}
+{% block content %}
+<h1>Your account is closed</h1>
+<p>Your details have been deleted. Thank you for being a member of the library. Go raibh maith agat!</p>
+<p><a class="btn" href="{{ url_for('main.home') }}">Home</a></p>
+{% endblock %}
